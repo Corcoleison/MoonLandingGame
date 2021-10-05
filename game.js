@@ -34,11 +34,55 @@ function  drawMotor(){
     ctx.beginPath();
     ctx.moveTo(spaceship.position.x-100, spaceship.position.y-50*Math.random());
     ctx.lineTo(spaceship.width * 0.5, spaceship.height * 0.5);
-    //ctx.lineTo(0, spaceship.height * 0.5 + 5);
     ctx.lineTo(spaceship.width * -0.5, spaceship.height * 0.5);
     ctx.closePath();
     ctx.fillStyle="orange";
     ctx.fill();
 }
 
-drawSpaceShip();
+function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    drawSpaceShip();
+    requestAnimationFrame(draw);
+}
+
+function keyDown(event){
+    switch (event.keyCode){
+        //w key
+        case 87:
+            spaceship.motorOn=true;
+            break;
+        //a key
+        case 65:
+            spaceship.facingLeft=true;
+            break;
+        //d key
+        case 68:
+            spaceship.facingTrue=true;
+            break;
+    }
+}
+
+function keyUp(event){
+    switch (event.keyCode){
+        //w key
+        case 87:
+            spaceship.motorOn=false;
+            break;
+        //a key
+        case 65:
+            spaceship.facingLeft=false;
+            break;
+        //d key
+        case 68:
+            spaceship.facingTrue=false;
+            break;
+    }
+}
+
+document.addEventListener('keydown', keyDown);
+document.addEventListener('keyup', keyUp);
+
+draw();
+
+
