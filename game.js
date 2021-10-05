@@ -32,9 +32,9 @@ function drawSpaceShip(){
 
 function  drawMotor(){
     ctx.beginPath();
-    ctx.moveTo(spaceship.width * -0.5, spaceship.height * 0.5);
+    ctx.moveTo(spaceship.position.x-100, spaceship.position.y-50*Math.random());
     ctx.lineTo(spaceship.width * 0.5, spaceship.height * 0.5);
-    ctx.lineTo(0, spaceship.height * 0.5 + Math.random() * 5);
+    //ctx.lineTo(0, spaceship.height * 0.5 + 5);
     ctx.lineTo(spaceship.width * -0.5, spaceship.height * 0.5);
     ctx.closePath();
     ctx.fillStyle="orange";
