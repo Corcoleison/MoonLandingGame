@@ -10,9 +10,9 @@ var spaceship={
         x:100,
         y:100,
     },
-    motorOn:true,
+    motorOn:false,
     facingLeft:false,
-    facingTrue:false,
+    facingRight:false,
 };
 
 function drawSpaceShip(){
@@ -32,16 +32,30 @@ function drawSpaceShip(){
 
 function  drawMotor(){
     ctx.beginPath();
-    ctx.moveTo(spaceship.position.x-100, spaceship.position.y-50*Math.random());
+    ctx.moveTo(spaceship.width * -0.5, spaceship.height * 0.5);
     ctx.lineTo(spaceship.width * 0.5, spaceship.height * 0.5);
-    ctx.lineTo(spaceship.width * -0.5, spaceship.height * 0.5);
+    ctx.lineTo(0, spaceship.height * 0.5 + Math.random() * 30);
     ctx.closePath();
     ctx.fillStyle="orange";
     ctx.fill();
 }
 
+function updateSpaceShip(){
+    if (spaceship.facingRight){
+        spaceship.angle +=Math.PI / 180;
+    }else if(spaceship.facingLeft){
+        spaceship.angle -=Math.PI / 180;
+    }
+
+    if(spaceship.motorOn){
+        spaceship.position.x+=Math.sin(spaceship.angle);
+        spaceship.position.y -=Math.cos(spaceship.angle);
+    }
+}
+
 function draw(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
+    updateSpaceShip();
     drawSpaceShip();
     requestAnimationFrame(draw);
 }
@@ -58,7 +72,7 @@ function keyDown(event){
             break;
         //d key
         case 68:
-            spaceship.facingTrue=true;
+            spaceship.facingRight=true;
             break;
     }
 }
@@ -75,7 +89,7 @@ function keyUp(event){
             break;
         //d key
         case 68:
-            spaceship.facingTrue=false;
+            spaceship.facingRight=false;
             break;
     }
 }
