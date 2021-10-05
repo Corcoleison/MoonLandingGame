@@ -1,61 +1,44 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext('2d');
 
-var y=0;
-// //Rectangle for spaceship
-// ctx.beginPath();
-// ctx.rect(200, 20, 50, 50);
-// ctx.fillStyle="gray";
-// ctx.fill();
-//
-// //triangle for motor
-// ctx.beginPath();
-// ctx.moveTo(250, 80);
-// ctx.lineTo(225, 100);
-// ctx.lineTo(200, 80);
-// ctx.fillStyle="orange";
-// ctx.fill();
+var spaceship={
+    color: "gray",
+    width: 40,
+    height: 60,
+    angle:0,
+    position:{
+        x:100,
+        y:100,
+    },
+    motorOn:true,
+    facingLeft:false,
+    facingTrue:false,
+};
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-}
-
-function drawStars(numberStars){
-    for(let i=0; i<numberStars; i++){
-        ctx.beginPath();
-        ctx.rect(getRandomInt(800), getRandomInt(800), 5,5);
-        ctx.fillStyle="white";
-        ctx.fill();
-    }
-
-}
-
-function draw(){
-    //clearing canvas
-    ctx.clearRect(0,0,canvas.width, canvas.height);
-
-    //drawing rectangle
+function drawSpaceShip(){
+    ctx.save();
     ctx.beginPath();
-    ctx.rect(200, y, 50, 50);
-    ctx.fillStyle="gray";
+    ctx.translate(spaceship.position.x, spaceship.position.y);
+    ctx.rotate(spaceship.angle);
+    ctx.rect(spaceship.width*-0.5, spaceship.height*-0.5, spaceship.width, spaceship.height);
+    ctx.fillStyle = spaceship.color;
     ctx.fill();
-
-    //incremeting y coordinate
-    y = y+5;
-
-    // if x coordinate reach the height
-    if (y >= 750){
-        y=750;
-    }else{
-        //call draw again
-        requestAnimationFrame(draw);
+    ctx.closePath();
+    if(spaceship.motorOn) {
+        drawMotor();
     }
+    ctx.restore();
 }
 
-
-function start(){
-    y=0
-    draw();
+function  drawMotor(){
+    ctx.beginPath();
+    ctx.moveTo(spaceship.width * -0.5, spaceship.height * 0.5);
+    ctx.lineTo(spaceship.width * 0.5, spaceship.height * 0.5);
+    ctx.lineTo(0, spaceship.height * 0.5 + Math.random() * 5);
+    ctx.lineTo(spaceship.width * -0.5, spaceship.height * 0.5);
+    ctx.closePath();
+    ctx.fillStyle="orange";
+    ctx.fill();
 }
-drawStars(10);
-canvas.addEventListener("click", start);
+
+drawSpaceShip();
