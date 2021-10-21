@@ -71,6 +71,16 @@ function updateSpaceShip() {
         spaceship.velocity.y += spaceship.thrust * Math.cos(spaceship.angle);
     }
     spaceship.velocity.y += gravity;
+    isInEdges();
+}
+
+function isInEdges(){
+    if (spaceship.position.y > canvas.height)   { 
+        spaceship.velocity.y = 0;
+        spaceship.velocity.x=0; 
+        spaceship.position.y = canvas.height-20;
+        gravity=0; 
+      }
 }
 
 function draw(){
