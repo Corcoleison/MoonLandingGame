@@ -45,20 +45,7 @@ function  drawMotor(){
     ctx.fill();
 }
 
-// function updateSpaceShip(){
-//     if (spaceship.facingRight){
-//         spaceship.angle +=Math.PI / 180;
-//     }else if(spaceship.facingLeft){
-//         spaceship.angle -=Math.PI / 180;
-//     }
-
-//     if(spaceship.motorOn){
-//         spaceship.position.x+=Math.sin(spaceship.angle);
-//         spaceship.position.y -=Math.cos(spaceship.angle);
-//     }
-// }
-
-var gravity = 0.1;
+var gravity = 0.05;
 
 function updateSpaceShip() {
     spaceship.position.x += spaceship.velocity.x;
@@ -75,18 +62,35 @@ function updateSpaceShip() {
 }
 
 function isInEdges(){
+    //ground
     if (spaceship.position.y > canvas.height)   { 
         spaceship.velocity.y = 0;
         spaceship.velocity.x=0; 
         spaceship.position.y = canvas.height-20;
         gravity=0; 
       }
+    //sides
+    if(spaceship.position.x > canvas.width){
+        spaceship.position.x=0;
+        //spaceship.velocity.x=-spaceship.velocity.x * 0.5;
+    }
+    if(spaceship.position.x < 0){
+        spaceship.position.x=canvas.width;
+        //spaceship.velocity.x=-spaceship.velocity.x*0.5;
+    }
 }
 
 function draw(){
+    var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+    if (!gamepads) {
+        return;
+    }
+    var gp = gamepads[0];
+    console.log(gp.axes);
     ctx.clearRect(0,0,canvas.width,canvas.height);
     updateSpaceShip();
     drawSpaceShip();
+    axismoved(gp.axes);
     requestAnimationFrame(draw);
 }
 
@@ -127,6 +131,51 @@ function keyUp(event){
 document.addEventListener('keydown', keyDown);
 document.addEventListener('keyup', keyUp);
 
-draw();
+var gamepadInfo = document.getElementById("gamepad-info");
+
+window.addEventListener("gamepadconnected", function(e) {
+    var gp = navigator.getGamepads()[e.gamepad.index];
+    gamepadInfo.innerHTML = "Gamepad connected at index " + gp.index + ": " + gp.id + ". It has " + gp.buttons.length + " buttons and " + gp.axes.length + " axes.";
+    
+    draw();
+  });
+
+window.addEventListener("gamepaddisconnected", function(e) {
+    gamepadInfo.innerHTML = "Waiting for gamepad.";
+
+    cancelRequestAnimationFrame(draw);
+});
+
+function axismoved(ax){
+    if (typeof(ax) == "object") {
+        //middle
+        if(ax[0]==0&ax[1]==0){
+            spaceship.motorOn=false;
+            spaceship.facingRight=false;
+            spaceship.facingLeft=false;
+        
+        }else if(ax[0]==0&ax[1]==-1){ //up 
+            spaceship.motorOn=true;
+
+        }else if(ax[0]==1&ax[1]==0){ //right
+            spaceship.facingRight=true;
+        }else if(ax[0]==1&ax[1]==1){ //down right
+            spaceship.facingRight=true;
+        }else if(ax[0]==1&ax[1]==1){ //up right
+            spaceship.facingRight=true;
+            spaceship.motorOn=true;
+
+        }else if(ax[0]==-1&ax[1]==0){ //left
+            spaceship.facingLeft=true;
+        }else if(ax[0]==-1&ax[1]==1){ //down left
+            spaceship.facingLeft=true;
+        }else if(ax[0]==-1&ax[1]==-1){ //up left
+            spaceship.facingLeft=true;
+            spaceship.motorOn=true;
+        }
+    }
+    return null;
+}
+  
 
 
