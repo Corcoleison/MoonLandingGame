@@ -7,9 +7,14 @@ var spaceship={
     height: 60,
     angle:0,
     position:{
-        x:100,
-        y:100,
+        x:0.2*canvas.width,
+        y:0.2*canvas.width,
     },
+    velocity: { 
+        x: 0.001 * canvas.width, 
+        y: -0.002 * canvas.width 
+    },
+    thrust:canvas.width*-0.0005,
     motorOn:false,
     facingLeft:false,
     facingRight:false,
@@ -40,17 +45,32 @@ function  drawMotor(){
     ctx.fill();
 }
 
-function updateSpaceShip(){
-    if (spaceship.facingRight){
-        spaceship.angle +=Math.PI / 180;
-    }else if(spaceship.facingLeft){
-        spaceship.angle -=Math.PI / 180;
-    }
+// function updateSpaceShip(){
+//     if (spaceship.facingRight){
+//         spaceship.angle +=Math.PI / 180;
+//     }else if(spaceship.facingLeft){
+//         spaceship.angle -=Math.PI / 180;
+//     }
 
-    if(spaceship.motorOn){
-        spaceship.position.x+=Math.sin(spaceship.angle);
-        spaceship.position.y -=Math.cos(spaceship.angle);
+//     if(spaceship.motorOn){
+//         spaceship.position.x+=Math.sin(spaceship.angle);
+//         spaceship.position.y -=Math.cos(spaceship.angle);
+//     }
+// }
+
+var gravity = 0.1;
+
+function updateSpaceShip() {
+    spaceship.position.x += spaceship.velocity.x;
+    spaceship.position.y += spaceship.velocity.y;
+    if (spaceship.facingRight) spaceship.angle += Math.PI / 180 * 2;
+    if (spaceship.facingLeft) spaceship.angle -= Math.PI / 180 * 2;
+
+    if (spaceship.motorOn) {
+        spaceship.velocity.x += spaceship.thrust * Math.sin(-spaceship.angle);
+        spaceship.velocity.y += spaceship.thrust * Math.cos(spaceship.angle);
     }
+    spaceship.velocity.y += gravity;
 }
 
 function draw(){
