@@ -61,13 +61,24 @@ function updateSpaceShip() {
     isInEdges();
 }
 
+var groundTouched=false;
+var goodEnd=false;
+var myReq;
+
 function isInEdges(){
+    let velocityY=null;
     //ground
-    if (spaceship.position.y > canvas.height)   { 
+    if (spaceship.position.y > canvas.height)   {
+        if(spaceship.velocity.y !=null && spaceship.velocity.y >=3){
+            goodEnd=true;
+        }else if(spaceship.velocity.y !=null && spaceship.velocity.y <3){
+            goodEnd=false;
+        }
         spaceship.velocity.y = 0;
         spaceship.velocity.x=0; 
         spaceship.position.y = canvas.height-20;
-        gravity=0; 
+        gravity=0;
+        groundTouched=true;
       }
     //sides
     if(spaceship.position.x > canvas.width){
@@ -78,6 +89,22 @@ function isInEdges(){
         spaceship.position.x=canvas.width;
         //spaceship.velocity.x=-spaceship.velocity.x*0.5;
     }
+    calculateEnd();
+}
+
+function calculateEnd(){
+    if(goodEnd && groundTouched){
+        ctx.font = "bold 50px serif";
+        ctx.fillStyle = "red";
+        ctx.textAlign = "center";
+        ctx.fillText("PATHETIC", canvas.width/2, canvas.height/2);
+        ctx.clearRect(0,0,canvas.width,canvas.height); 
+    }else if(!goodEnd && groundTouched){
+        ctx.font = "bold 50px serif";
+        ctx.fillStyle = "green";
+        ctx.textAlign = "center";
+        ctx.fillText("CONGRATULATIONS", canvas.width/2, canvas.height/2); 
+    }
 }
 
 function draw(){
@@ -86,12 +113,24 @@ function draw(){
         return;
     }
     var gp = gamepads[0];
-    console.log(gp.axes);
     ctx.clearRect(0,0,canvas.width,canvas.height);
     updateSpaceShip();
     drawSpaceShip();
-    axismoved(gp.axes);
+    if(!groundTouched){
+        axismoved(gp.axes);
+    }
+    buttonPressed(gp.buttons);
+    drawStats();
     requestAnimationFrame(draw);
+}
+
+var velocityInfo = document.getElementById("velocity-info");
+
+function drawStats(){
+    if (!spaceship.velocity){
+        return;
+    }
+    velocityInfo.innerHTML="Velocity y: "+spaceship.velocity.y+ " Velocity x:" +spaceship.velocity.x;
 }
 
 function keyDown(event){
@@ -176,6 +215,15 @@ function axismoved(ax){
     }
     return null;
 }
+
+function buttonPressed(b) {
+    if (typeof(b[2]) == "object") {
+      if(b[0].pressed){
+          location.reload();
+      }
+    }
+    return null;
+  }
   
 
 
