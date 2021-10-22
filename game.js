@@ -28,6 +28,8 @@ var spaceship={
     facingRight:false,
 };
 
+
+
 function drawStars(){
     ctx.save();
     ctx.beginPath();
@@ -37,15 +39,45 @@ function drawStars(){
     
 }
 
+var landingPlatform={
+    color:"blue",
+    width: 100,
+    height: 50,
+    position:{
+        x:canvas.width/2,
+        y:canvas.height-200,
+    }
+}
+
+function drawlandingPlatform(){
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(landingPlatform.position.x, landingPlatform.position.y,landingPlatform.width,landingPlatform.height);
+    ctx.fillStyle = landingPlatform.color;
+    ctx.fill();
+    ctx.closePath();
+    ctx.restore();
+}
+
+function RectsColliding(r1,r2){
+    return !(
+        r1.position.x>r2.position.x+r2.width || 
+        r1.position.x+r1.width<r2.position.x || 
+        r1.position.y>r2.y+r2.height || 
+        r1.position.y+r1.height<r2.position.y
+    );
+}
+
 function drawSpaceShip(){
     ctx.save();
     ctx.beginPath();
     ctx.translate(spaceship.position.x, spaceship.position.y);
     ctx.rotate(spaceship.angle);
-    ctx.drawImage(img,spaceship.width*-0.5,spaceship.height*-0.5,spaceship.width,spaceship.height);
+    //ctx.drawImage(img,spaceship.width*-0.5,spaceship.height*-0.5,spaceship.width,spaceship.height);
     ctx.rect(spaceship.width*-0.5, spaceship.height*-0.5, spaceship.width, spaceship.height);
     ctx.fillStyle = spaceship.color;
-    ctx.stroke();
+    //ctx.stroke();
+    ctx.fill();
     ctx.closePath();
     if(spaceship.motorOn) {
         drawMotor();
@@ -76,7 +108,6 @@ function updateSpaceShip() {
         spaceship.velocity.y += spaceship.thrust * Math.cos(spaceship.angle);
     }
     spaceship.velocity.y += gravity;
-    isInEdges();
 }
 
 var groundTouched=false;
@@ -88,16 +119,21 @@ numparticles=500;
 
 function isInEdges(){
     let velocityY=null;
-    //ground
-    if (spaceship.position.y > canvas.height)   {
+    //landingPlatform
+    if (spaceship.position.y > canvas.height-spaceship.height*0.5)   {
+        if(ended){
+            return;
+        }
+        let rotationShip=spaceship.angle;
         if(spaceship.velocity.y >=3){
             goodEnd=false;
         }else if(spaceship.velocity.y <3){
             goodEnd=true;
         }
+        spaceship.position.y=canvas.height-spaceship.height*0.5;
         spaceship.velocity.y = 0;
-        spaceship.velocity.x=0; 
-        spaceship.position.y = canvas.height;
+        spaceship.velocity.x=0;
+        spaceship.angle=rotationShip;
         gravity=0;
         groundTouched=true;
         for(i=0;i<numparticles;i++){
@@ -106,21 +142,21 @@ function isInEdges(){
         ended=true;
     }
     //sides
-    if(spaceship.position.x > canvas.width){
+    if(spaceship.position.x > canvas.width-spaceship.width*0.5){
         //spaceship.position.x=0; // appears in the other side
         
-        spaceship.position.x = canvas.width;
+        spaceship.position.x = canvas.width-spaceship.width*0.5;
         spaceship.velocity.x=-spaceship.velocity.x * 0.05;
     }
-    if(spaceship.position.x < 0){
+    if(spaceship.position.x < 0+spaceship.width*0.5){
         //spaceship.position.x=canvas.width; // appears in the other side
         
-        spaceship.position.x=0;
+        spaceship.position.x=0+spaceship.width*0.5;
         spaceship.velocity.x=-spaceship.velocity.x*0.05;
     }
     //up
-    if(spaceship.position.y < 0){
-        spaceship.position.y=0;
+    if(spaceship.position.y < 0+spaceship.height*0.5){
+        spaceship.position.y=0+spaceship.height*0.5;
         spaceship.velocity.y=-spaceship.velocity.y *0;
         //spaceship.velocity.x=-spaceship.velocity.x * 0.5;
     }
@@ -134,6 +170,7 @@ function calculateEnd(){
     if(!goodEnd && groundTouched){
         ctx.clearRect(0,0,canvas.width,canvas.height);
         drawStars();
+        //drawlandingPlatform();
         ctx.font = "bold 50px serif";
         ctx.fillStyle = "red";
         ctx.textAlign = "center";
@@ -161,8 +198,10 @@ function draw(){
     var gp = gamepads[0];
     ctx.clearRect(0,0,canvas.width,canvas.height);
     drawStars();
-    updateSpaceShip();
+    //drawlandingPlatform();
+    isInEdges();
     if(!groundTouched){
+        updateSpaceShip();
         drawSpaceShip();
         axismoved(gp.axes);
     }else{
@@ -279,12 +318,7 @@ function buttonPressed(b) {
     return null;
   }
 
-  function contains(targetA, spaceship) {
-    return !(spaceship.position.x > (targetA.x + targetA.width) || 
-             (spaceship.position.x + spaceship.width) < targetA.x || 
-             spaceship.position.y > (targetA.x + targetA.height) ||
-             (spaceship.position.y + spaceship.height) < targetA.y);
-  }
+
 
   
   
