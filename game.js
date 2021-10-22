@@ -82,11 +82,11 @@ function isInEdges(){
         spaceship.position.y = canvas.height-20;
         gravity=0;
         groundTouched=true;
-        ctx.clearRect(0,0,canvas.width,canvas.height);
         for(i=0;i<numparticles;i++){
             particles.push(particle.create(spaceship.position.x,spaceship.position.y,(Math.random()*10)+1,Math.random()*Math.PI*2))
         }
-        }
+        ended=true;
+    }
     //sides
     if(spaceship.position.x > canvas.width){
         spaceship.position.x=0;
@@ -100,10 +100,11 @@ function isInEdges(){
 }
 
 
-
+var ended=false;
 
 function calculateEnd(){
     if(!goodEnd && groundTouched){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.font = "bold 50px serif";
         ctx.fillStyle = "red";
         ctx.textAlign = "center";
@@ -113,12 +114,13 @@ function calculateEnd(){
             ctx.beginPath();
             ctx.arc(particles[i].position.getX(),particles[i].position.getY(),3,0,2*Math.PI,false);
             ctx.fill();
-            }
+        }
     }else if(goodEnd && groundTouched){
         ctx.font = "bold 50px serif";
         ctx.fillStyle = "green";
         ctx.textAlign = "center";
-        ctx.fillText("CONGRATULATIONS", canvas.width/2, canvas.height/2); 
+        ctx.fillText("CONGRATULATIONS", canvas.width/2, canvas.height/2);
+        drawSpaceShip();
     }
 }
 
@@ -133,10 +135,17 @@ function draw(){
     if(!groundTouched){
         drawSpaceShip();
         axismoved(gp.axes);
+    }else{
+        resetStats();
     }
     buttonPressed(gp.buttons);
     drawStats();
     requestAnimationFrame(draw);
+}
+
+function resetStats(){
+    spaceship.velocity.x=0;
+    spaceship.velocity.y=0;
 }
 
 var velocityInfo = document.getElementById("velocity-info");
@@ -215,7 +224,7 @@ function axismoved(ax){
             spaceship.facingRight=true;
         }else if(ax[0]==1&ax[1]==1){ //down right
             spaceship.facingRight=true;
-        }else if(ax[0]==1&ax[1]==1){ //up right
+        }else if(ax[0]==1&ax[1]==-1){ //up right
             spaceship.facingRight=true;
             spaceship.motorOn=true;
 
