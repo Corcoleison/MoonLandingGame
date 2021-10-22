@@ -65,21 +65,28 @@ var groundTouched=false;
 var goodEnd=false;
 var myReq;
 
+particles=[];
+numparticles=500;
+
 function isInEdges(){
     let velocityY=null;
     //ground
     if (spaceship.position.y > canvas.height)   {
-        if(spaceship.velocity.y !=null && spaceship.velocity.y >=3){
-            goodEnd=true;
-        }else if(spaceship.velocity.y !=null && spaceship.velocity.y <3){
+        if(spaceship.velocity.y >=3){
             goodEnd=false;
+        }else if(spaceship.velocity.y <3){
+            goodEnd=true;
         }
         spaceship.velocity.y = 0;
         spaceship.velocity.x=0; 
         spaceship.position.y = canvas.height-20;
         gravity=0;
         groundTouched=true;
-      }
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        for(i=0;i<numparticles;i++){
+            particles.push(particle.create(spaceship.position.x,spaceship.position.y,(Math.random()*10)+1,Math.random()*Math.PI*2))
+        }
+        }
     //sides
     if(spaceship.position.x > canvas.width){
         spaceship.position.x=0;
@@ -92,14 +99,22 @@ function isInEdges(){
     calculateEnd();
 }
 
+
+
+
 function calculateEnd(){
-    if(goodEnd && groundTouched){
+    if(!goodEnd && groundTouched){
         ctx.font = "bold 50px serif";
         ctx.fillStyle = "red";
         ctx.textAlign = "center";
         ctx.fillText("PATHETIC", canvas.width/2, canvas.height/2);
-        ctx.clearRect(0,0,canvas.width,canvas.height); 
-    }else if(!goodEnd && groundTouched){
+        for (var i = 0; i < numparticles; i++) {
+            particles[i].update();
+            ctx.beginPath();
+            ctx.arc(particles[i].position.getX(),particles[i].position.getY(),3,0,2*Math.PI,false);
+            ctx.fill();
+            }
+    }else if(goodEnd && groundTouched){
         ctx.font = "bold 50px serif";
         ctx.fillStyle = "green";
         ctx.textAlign = "center";
@@ -115,8 +130,8 @@ function draw(){
     var gp = gamepads[0];
     ctx.clearRect(0,0,canvas.width,canvas.height);
     updateSpaceShip();
-    drawSpaceShip();
     if(!groundTouched){
+        drawSpaceShip();
         axismoved(gp.axes);
     }
     buttonPressed(gp.buttons);
