@@ -89,12 +89,22 @@ function isInEdges(){
     }
     //sides
     if(spaceship.position.x > canvas.width){
-        spaceship.position.x=0;
-        //spaceship.velocity.x=-spaceship.velocity.x * 0.5;
+        //spaceship.position.x=0; // appears in the other side
+        
+        spaceship.position.x = canvas.width;
+        spaceship.velocity.x=-spaceship.velocity.x * 0.05;
     }
     if(spaceship.position.x < 0){
-        spaceship.position.x=canvas.width;
-        //spaceship.velocity.x=-spaceship.velocity.x*0.5;
+        //spaceship.position.x=canvas.width; // appears in the other side
+        
+        spaceship.position.x=0;
+        spaceship.velocity.x=-spaceship.velocity.x*0.05;
+    }
+    //up
+    if(spaceship.position.y < 0){
+        spaceship.position.y=0;
+        spaceship.velocity.y=-spaceship.velocity.y *0;
+        //spaceship.velocity.x=-spaceship.velocity.x * 0.5;
     }
     calculateEnd();
 }
