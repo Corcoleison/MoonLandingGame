@@ -1,6 +1,14 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext('2d');
 
+var img = new Image();
+img.src = 'spaceship_cartoon.png';
+var pattern = ctx.createPattern(img, 'repeat');
+
+var img_stars = new Image();
+img_stars.src = 'stars.jpg';
+var pattern_stars = ctx.createPattern(img, 'repeat');
+
 var spaceship={
     color: "gray",
     width: 40,
@@ -20,14 +28,24 @@ var spaceship={
     facingRight:false,
 };
 
+function drawStars(){
+    ctx.save();
+    ctx.beginPath();
+    ctx.drawImage(img_stars,0,0);
+    ctx.closePath();
+    ctx.restore();
+    
+}
+
 function drawSpaceShip(){
     ctx.save();
     ctx.beginPath();
     ctx.translate(spaceship.position.x, spaceship.position.y);
     ctx.rotate(spaceship.angle);
+    ctx.drawImage(img,spaceship.width*-0.5,spaceship.height*-0.5,spaceship.width,spaceship.height);
     ctx.rect(spaceship.width*-0.5, spaceship.height*-0.5, spaceship.width, spaceship.height);
     ctx.fillStyle = spaceship.color;
-    ctx.fill();
+    ctx.stroke();
     ctx.closePath();
     if(spaceship.motorOn) {
         drawMotor();
@@ -79,7 +97,7 @@ function isInEdges(){
         }
         spaceship.velocity.y = 0;
         spaceship.velocity.x=0; 
-        spaceship.position.y = canvas.height-20;
+        spaceship.position.y = canvas.height;
         gravity=0;
         groundTouched=true;
         for(i=0;i<numparticles;i++){
@@ -115,6 +133,7 @@ var ended=false;
 function calculateEnd(){
     if(!goodEnd && groundTouched){
         ctx.clearRect(0,0,canvas.width,canvas.height);
+        drawStars();
         ctx.font = "bold 50px serif";
         ctx.fillStyle = "red";
         ctx.textAlign = "center";
@@ -141,6 +160,7 @@ function draw(){
     }
     var gp = gamepads[0];
     ctx.clearRect(0,0,canvas.width,canvas.height);
+    drawStars();
     updateSpaceShip();
     if(!groundTouched){
         drawSpaceShip();
@@ -258,6 +278,15 @@ function buttonPressed(b) {
     }
     return null;
   }
+
+  function contains(targetA, spaceship) {
+    return !(spaceship.position.x > (targetA.x + targetA.width) || 
+             (spaceship.position.x + spaceship.width) < targetA.x || 
+             spaceship.position.y > (targetA.x + targetA.height) ||
+             (spaceship.position.y + spaceship.height) < targetA.y);
+  }
+
+  
   
 
 
