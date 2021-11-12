@@ -78,14 +78,30 @@ function drawlandingPlatform(){
     ctx.restore();
 }
 
-function RectsColliding(r1,r2){
-    return !(
-        r1.position.x>r2.position.x+r2.width || 
-        r1.position.x+r1.width<r2.position.x || 
-        r1.position.y>r2.y+r2.height || 
-        r1.position.y+r1.height<r2.position.y
-    );
+function rectIntersect(x1, y1, w1, h1, x2, y2, w2, h2) {
+    // Check x and y for overlap
+    if (x2 > w1 + x1 || x1 > w2 + x2 || y2 > h1 + y1 || y1 > h2 + y2){
+        return false;
+    }
+    return true;
 }
+
+function collisionBetweenShips(){
+    if(rectIntersect(spaceship.position.x, spaceship.position.y, spaceship.width, spaceship.height,
+        spaceship2.position.x, spaceship2.position.y, spaceship2.width, spaceship2.height)){
+            let initialp1velocity = spaceship.velocity;
+            let initialp2velocity = spaceship2.velocity;
+            spaceship.velocity=initialp2velocity;
+            spaceship2.velocity=initialp1velocity;
+        }
+}
+
+// function RectsColliding(targetA, targetB) {
+//     return !(targetB.position.x > (targetA.position.x + targetA.width) || 
+//              (targetB.position.x + targetB.width) < targetA.position.x || 
+//              targetB.position.y > (targetA.position.x + targetA.height) ||
+//              (targetB.position.y + targetB.height) < targetA.position.y);
+//   }
 
 function drawSpaceShip(ship){
     ctx.save();
@@ -132,60 +148,62 @@ function updateSpaceShip(ship) {
 var groundTouched=false;
 var goodEnd=false;
 var myReq;
+var winner=null;
 
 particles=[];
 numparticles=500;
 
-function isInEdges(spaceship){
+function isInEdges(ship){
     let velocityY=null;
     //landingPlatform
-    if (spaceship.position.y > canvas.height-spaceship.height*0.5)   {
+    if (ship.position.y > canvas.height-ship.height*0.5)   {
         if(ended){
             return;
         }
-        let rotationShip=spaceship.angle;
-        if(spaceship.velocity.y >=3){
+        let rotationShip=ship.angle;
+        if(ship.velocity.y >=3){
             goodEnd=false;
-        }else if(spaceship.velocity.y <3){
+        }else if(ship.velocity.y <3){
             goodEnd=true;
+            winner=ship;
         }
-        spaceship.position.y=canvas.height-spaceship.height*0.5;
-        spaceship.velocity.y = 0;
-        spaceship.velocity.x=0;
-        spaceship.angle=rotationShip;
+        ship.position.y=canvas.height-ship.height*0.5;
+        ship.velocity.y = 0;
+        ship.velocity.x=0;
+        ship.angle=rotationShip;
         gravity=0;
         groundTouched=true;
         for(i=0;i<numparticles;i++){
-            particles.push(particle.create(spaceship.position.x,spaceship.position.y,(Math.random()*10)+1,Math.random()*Math.PI*2))
+            particles.push(particle.create(ship.position.x,ship.position.y,(Math.random()*10)+1,Math.random()*Math.PI*2))
         }
         ended=true;
     }
     //sides
-    if(spaceship.position.x > canvas.width-spaceship.width*0.5){
+    if(ship.position.x > canvas.width-ship.width*0.5){
         //spaceship.position.x=0; // appears in the other side
         
-        spaceship.position.x = canvas.width-spaceship.width*0.5;
-        spaceship.velocity.x=-spaceship.velocity.x * 0.05;
+        ship.position.x = canvas.width-ship.width*0.5;
+        ship.velocity.x=-ship.velocity.x * 0.05;
     }
-    if(spaceship.position.x < 0+spaceship.width*0.5){
+    if(ship.position.x < 0+ship.width*0.5){
         //spaceship.position.x=canvas.width; // appears in the other side
         
-        spaceship.position.x=0+spaceship.width*0.5;
-        spaceship.velocity.x=-spaceship.velocity.x*0.05;
+        ship.position.x=0+ship.width*0.5;
+        ship.velocity.x=-ship.velocity.x*0.05;
     }
     //up
-    if(spaceship.position.y < 0+spaceship.height*0.5){
-        spaceship.position.y=0+spaceship.height*0.5;
-        spaceship.velocity.y=-spaceship.velocity.y *0;
+    if(ship.position.y < 0+ship.height*0.5){
+        ship.position.y=0+ship.height*0.5;
+        ship.velocity.y=-ship.velocity.y *0;
         //spaceship.velocity.x=-spaceship.velocity.x * 0.5;
     }
-    calculateEnd();
+    calculateEnd(ship);
 }
 
 
 var ended=false;
 
-function calculateEnd(){
+function calculateEnd(ship){
     if(!goodEnd && groundTouched){
         ctx.clearRect(0,0,canvas.width,canvas.height);
         drawStars();
@@ -205,7 +223,13 @@ function calculateEnd(){
         ctx.fillStyle = "green";
         ctx.textAlign = "center";
         ctx.fillText("CONGRATULATIONS", canvas.width/2, canvas.height/2);
-        drawSpaceShip();
+        for (var i = 0; i < numparticles; i++) {
+            particles[i].update();
+            ctx.beginPath();
+            ctx.arc(particles[i].position.getX(),particles[i].position.getY(),3,0,2*Math.PI,false);
+            ctx.fill();
+        }
+        drawSpaceShip(winner);
     }
 }
 
@@ -220,17 +244,18 @@ function draw(){
     //drawlandingPlatform();
     isInEdges(spaceship);
     isInEdges(spaceship2);
+    collisionBetweenShips();
     if(!groundTouched){
         updateSpaceShip(spaceship);
         drawSpaceShip(spaceship);
         updateSpaceShip(spaceship2);
         drawSpaceShip(spaceship2);
         axismoved(gp.axes);
-        buttonPressed(gp.buttons);
     }else{
         resetStats(spaceship);
         resetStats(spaceship2);
     }
+    buttonPressed(gp.buttons);
     drawStats();
     requestAnimationFrame(draw);
 }
@@ -240,13 +265,15 @@ function resetStats(spaceship){
     spaceship.velocity.y=0;
 }
 
-var velocityInfo = document.getElementById("velocity-info");
+var velocityInfoGamepad = document.getElementById("velocity-info-gamepad");
+var velocityInfoKeyboard = document.getElementById("velocity-info-keyboard");
 
 function drawStats(){
     if (!spaceship.velocity){
         return;
     }
-    velocityInfo.innerHTML="Velocity y: "+spaceship.velocity.y+ " Velocity x:" +spaceship.velocity.x;
+    velocityInfoGamepad.innerHTML="Velocity y: "+spaceship.velocity.y+ " Velocity x:" +spaceship.velocity.x;
+    velocityInfoKeyboard.innerHTML="Velocity y: "+spaceship2.velocity.y+ " Velocity x:" +spaceship2.velocity.x;
 }
 
 function keyDown(event){
@@ -334,7 +361,7 @@ function axismoved(ax){
 
 function buttonPressed(b) {
     if (typeof(b[2]) == "object") {
-      if(b[0].pressed){
+      if(b[9].pressed){
           location.reload();
       }
     }
