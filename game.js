@@ -28,6 +28,25 @@ var spaceship={
     facingRight:false,
 };
 
+var spaceship2={
+    color: "yellow",
+    width: 40,
+    height: 60,
+    angle:0,
+    position:{
+        x:0.8*canvas.width,
+        y:0.2*canvas.width,
+    },
+    velocity: { 
+        x: -0.001 * canvas.width, 
+        y: -0.002 * canvas.width 
+    },
+    thrust:canvas.width*-0.0005,
+    motorOn:false,
+    facingLeft:false,
+    facingRight:false,
+};
+
 
 
 function drawStars(){
@@ -68,28 +87,28 @@ function RectsColliding(r1,r2){
     );
 }
 
-function drawSpaceShip(){
+function drawSpaceShip(ship){
     ctx.save();
     ctx.beginPath();
-    ctx.translate(spaceship.position.x, spaceship.position.y);
-    ctx.rotate(spaceship.angle);
-    //ctx.drawImage(img,spaceship.width*-0.5,spaceship.height*-0.5,spaceship.width,spaceship.height);
-    ctx.rect(spaceship.width*-0.5, spaceship.height*-0.5, spaceship.width, spaceship.height);
-    ctx.fillStyle = spaceship.color;
+    ctx.translate(ship.position.x, ship.position.y);
+    ctx.rotate(ship.angle);
+    //ctx.drawImage(img,ship.width*-0.5,ship.height*-0.5,ship.width,ship.height);
+    ctx.rect(ship.width*-0.5, ship.height*-0.5, ship.width, ship.height);
+    ctx.fillStyle = ship.color;
     //ctx.stroke();
     ctx.fill();
     ctx.closePath();
-    if(spaceship.motorOn) {
-        drawMotor();
+    if(ship.motorOn) {
+        drawMotor(ship);
     }
     ctx.restore();
 }
 
-function  drawMotor(){
+function  drawMotor(ship){
     ctx.beginPath();
-    ctx.moveTo(spaceship.width * -0.5, spaceship.height * 0.5);
-    ctx.lineTo(spaceship.width * 0.5, spaceship.height * 0.5);
-    ctx.lineTo(0, spaceship.height * 0.5 + Math.random() * 30);
+    ctx.moveTo(ship.width * -0.5, ship.height * 0.5);
+    ctx.lineTo(ship.width * 0.5, ship.height * 0.5);
+    ctx.lineTo(0, ship.height * 0.5 + Math.random() * 30);
     ctx.closePath();
     ctx.fillStyle="orange";
     ctx.fill();
@@ -97,17 +116,17 @@ function  drawMotor(){
 
 var gravity = 0.05;
 
-function updateSpaceShip() {
-    spaceship.position.x += spaceship.velocity.x;
-    spaceship.position.y += spaceship.velocity.y;
-    if (spaceship.facingRight) spaceship.angle += Math.PI / 180 * 2;
-    if (spaceship.facingLeft) spaceship.angle -= Math.PI / 180 * 2;
+function updateSpaceShip(ship) {
+    ship.position.x += ship.velocity.x;
+    ship.position.y += ship.velocity.y;
+    if (ship.facingRight) ship.angle += Math.PI / 180 * 2;
+    if (ship.facingLeft) ship.angle -= Math.PI / 180 * 2;
 
-    if (spaceship.motorOn) {
-        spaceship.velocity.x += spaceship.thrust * Math.sin(-spaceship.angle);
-        spaceship.velocity.y += spaceship.thrust * Math.cos(spaceship.angle);
+    if (ship.motorOn) {
+        ship.velocity.x += ship.thrust * Math.sin(-ship.angle);
+        ship.velocity.y += ship.thrust * Math.cos(ship.angle);
     }
-    spaceship.velocity.y += gravity;
+    ship.velocity.y += gravity;
 }
 
 var groundTouched=false;
@@ -117,7 +136,7 @@ var myReq;
 particles=[];
 numparticles=500;
 
-function isInEdges(){
+function isInEdges(spaceship){
     let velocityY=null;
     //landingPlatform
     if (spaceship.position.y > canvas.height-spaceship.height*0.5)   {
@@ -199,20 +218,24 @@ function draw(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     drawStars();
     //drawlandingPlatform();
-    isInEdges();
+    isInEdges(spaceship);
+    isInEdges(spaceship2);
     if(!groundTouched){
-        updateSpaceShip();
-        drawSpaceShip();
+        updateSpaceShip(spaceship);
+        drawSpaceShip(spaceship);
+        updateSpaceShip(spaceship2);
+        drawSpaceShip(spaceship2);
         axismoved(gp.axes);
+        buttonPressed(gp.buttons);
     }else{
-        resetStats();
+        resetStats(spaceship);
+        resetStats(spaceship2);
     }
-    buttonPressed(gp.buttons);
     drawStats();
     requestAnimationFrame(draw);
 }
 
-function resetStats(){
+function resetStats(spaceship){
     spaceship.velocity.x=0;
     spaceship.velocity.y=0;
 }
@@ -230,15 +253,15 @@ function keyDown(event){
     switch (event.keyCode){
         //w key
         case 87:
-            spaceship.motorOn=true;
+            spaceship2.motorOn=true;
             break;
         //a key
         case 65:
-            spaceship.facingLeft=true;
+            spaceship2.facingLeft=true;
             break;
         //d key
         case 68:
-            spaceship.facingRight=true;
+            spaceship2.facingRight=true;
             break;
     }
 }
@@ -247,15 +270,15 @@ function keyUp(event){
     switch (event.keyCode){
         //w key
         case 87:
-            spaceship.motorOn=false;
+            spaceship2.motorOn=false;
             break;
         //a key
         case 65:
-            spaceship.facingLeft=false;
+            spaceship2.facingLeft=false;
             break;
         //d key
         case 68:
-            spaceship.facingRight=false;
+            spaceship2.facingRight=false;
             break;
     }
 }
