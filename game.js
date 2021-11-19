@@ -35,6 +35,78 @@ function playAudioLanding(ship){
     ship.played_landing=true;
 }
 
+var audio_engine_sp1 = new Audio('sound/engine_short.mp3');
+
+var audio_engine_sp2 = new Audio('sound/engine_short.mp3');
+
+function playAudioEngineSP1(){
+    audio_engine_sp1.load();
+    let play = audio_engine_sp1.play();
+    if (play !== undefined) {
+        play.then(_ => {
+          // Automatic playback started!
+          // Show playing UI.
+        })
+        .catch(error => {
+          // Auto-play was prevented
+          // Show paused UI.
+        });
+    }
+    audio_engine_sp1.loop=false;
+}
+
+function playAudioEngineSP2(){
+    audio_engine_sp2.load();
+    let play = audio_engine_sp2.play();
+    if (play !== undefined) {
+        play.then(_ => {
+          // Automatic playback started!
+          // Show playing UI.
+        })
+        .catch(error => {
+          // Auto-play was prevented
+          // Show paused UI.
+        });
+    }
+    audio_engine_sp2.loop=false;
+}
+
+var audio_punch = new Audio('sound/punch.mp3');
+
+function playAudioPunch(){
+    audio_punch.load();
+    let play = audio_punch.play();
+    if (play !== undefined) {
+        play.then(_ => {
+          // Automatic playback started!
+          // Show playing UI.
+        })
+        .catch(error => {
+          // Auto-play was prevented
+          // Show paused UI.
+        });
+    }
+    audio_punch.loop=false;
+}
+
+var audio_theme = new Audio('sound/theme.mp3');
+
+function playAudioTheme(){
+    audio_theme.load();
+    let play = audio_theme.play();
+    if (play !== undefined) {
+        play.then(_ => {
+          // Automatic playback started!
+          // Show playing UI.
+        })
+        .catch(error => {
+          // Auto-play was prevented
+          // Show paused UI.
+        });
+    }
+    audio_theme.loop=false;
+}
+
 var spaceship={
     color: "RED",
     width: 50,
@@ -135,10 +207,26 @@ function rectIntersect(x1, y1, w1, h1, x2, y2, w2, h2) {
 function collisionBetweenShips(){
     if(rectIntersect(spaceship.position.x, spaceship.position.y, spaceship.width, spaceship.height,
         spaceship2.position.x, spaceship2.position.y, spaceship2.width, spaceship2.height)){
+            if(spaceship.groundTouched){
+                spaceship2.end=true;
+                spaceship2.goodEnd=false;
+                spaceship2.groundTouched=true;
+                for(i=0;i<numparticles;i++){
+                    spaceship2.particles.push(particle.create(spaceship2.position.x,spaceship2.position.y,(Math.random()*10)+1,Math.random()*Math.PI*2))
+                }
+            }else if(spaceship2.groundTouched){
+                spaceship.end=true;
+                spaceship.goodEnd=false;
+                spaceship.groundTouched=true;
+                for(i=0;i<numparticles;i++){
+                    spaceship.particles.push(particle.create(spaceship.position.x,spaceship.position.y,(Math.random()*10)+1,Math.random()*Math.PI*2))
+                }
+            }
             let initialp1velocity = spaceship.velocity;
             let initialp2velocity = spaceship2.velocity;
             spaceship.velocity=initialp2velocity;
             spaceship2.velocity=initialp1velocity;
+            playAudioPunch();
         }
 }
 
@@ -208,7 +296,7 @@ function isInEdges(ship){
         if(ship.velocity.y >=3){
             ship.end=true;
             ship.goodEnd=false;
-        }else if(ship.velocity.y <3){
+        }else if(ship.velocity.y <3 && ((ship.angle < 0.5 && ship.angle>-0.5))){
             winner=ship;
             ship.end=true;
             ship.goodEnd=true;
@@ -264,8 +352,8 @@ function calculateEnd(ship){
             ctx.fill();
         }
         playAudioExplosion(ship);
-        ship.position.y=0;
-        ship.position.x=0;
+        ship.position.y=-50;
+        ship.position.x=-50;
     }else if(ship.goodEnd && ship.groundTouched){
         //ctx.clearRect(0,0,canvas.width,canvas.height);
         //drawStars();
@@ -308,13 +396,8 @@ function draw(){
         drawSpaceShip(spaceship2);
         }
     }
-    if(!(spaceship2.end && spaceship.end)){
+    if(!spaceship.end){
         axismoved(gp.axes);
-        
-    }else if(spaceship2.end && spaceship.end){
-        if(!(spaceship2.goodEnd && spaceship.goodEnd)){
-            
-        }
     }
     buttonPressed(gp.buttons);
     drawStats();
@@ -338,19 +421,22 @@ function drawStats(){
 }
 
 function keyDown(event){
-    switch (event.keyCode){
-        //w key
-        case 87:
-            spaceship2.motorOn=true;
-            break;
-        //a key
-        case 65:
-            spaceship2.facingLeft=true;
-            break;
-        //d key
-        case 68:
-            spaceship2.facingRight=true;
-            break;
+    if(!spaceship2.end){
+        switch (event.keyCode){
+            //w key
+            case 87:
+                spaceship2.motorOn=true;
+                playAudioEngineSP2();
+                break;
+            //a key
+            case 65:
+                spaceship2.facingLeft=true;
+                break;
+            //d key
+            case 68:
+                spaceship2.facingRight=true;
+                break;
+        }
     }
 }
 
@@ -381,6 +467,7 @@ window.addEventListener("gamepadconnected", function(e) {
     gamepadInfo.innerHTML = "Gamepad connected at index " + gp.index + ": " + gp.id + ". It has " + gp.buttons.length + " buttons and " + gp.axes.length + " axes.";
     
     draw();
+    playAudioTheme();
   });
 
 window.addEventListener("gamepaddisconnected", function(e) {
@@ -399,7 +486,7 @@ function axismoved(ax){
         
         }else if(ax[0]==0&ax[1]==-1){ //up 
             spaceship.motorOn=true;
-
+            playAudioEngineSP1();
         }else if(ax[0]==1&ax[1]==0){ //right
             spaceship.facingRight=true;
         }else if(ax[0]==1&ax[1]==1){ //down right
@@ -407,6 +494,7 @@ function axismoved(ax){
         }else if(ax[0]==1&ax[1]==-1){ //up right
             spaceship.facingRight=true;
             spaceship.motorOn=true;
+            playAudioEngineSP1();
 
         }else if(ax[0]==-1&ax[1]==0){ //left
             spaceship.facingLeft=true;
@@ -415,6 +503,7 @@ function axismoved(ax){
         }else if(ax[0]==-1&ax[1]==-1){ //up left
             spaceship.facingLeft=true;
             spaceship.motorOn=true;
+            playAudioEngineSP1();
         }
     }
     return null;
