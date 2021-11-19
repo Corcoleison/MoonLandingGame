@@ -1,18 +1,22 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext('2d');
 
-var img = new Image();
-img.src = 'spaceship_cartoon.png';
-var pattern = ctx.createPattern(img, 'repeat');
+var img_spaceship = new Image();
+img_spaceship.src = 'spaceship_cartoon.png';
+var pattern = ctx.createPattern(img_spaceship, 'repeat');
+
+var img_spaceship2 = new Image();
+img_spaceship2.src = 'spaceship2.png';
+var pattern = ctx.createPattern(img_spaceship2, 'repeat');
 
 var img_stars = new Image();
 img_stars.src = 'stars.jpg';
-var pattern_stars = ctx.createPattern(img, 'repeat');
+var pattern_stars = ctx.createPattern(img_stars, 'repeat');
 
 var spaceship={
     color: "gray",
-    width: 40,
-    height: 60,
+    width: 50,
+    height: 70,
     angle:0,
     position:{
         x:0.2*canvas.width,
@@ -26,12 +30,13 @@ var spaceship={
     motorOn:false,
     facingLeft:false,
     facingRight:false,
+    img:img_spaceship,
 };
 
 var spaceship2={
     color: "yellow",
-    width: 40,
-    height: 60,
+    width: 50,
+    height: 70,
     angle:0,
     position:{
         x:0.8*canvas.width,
@@ -45,6 +50,7 @@ var spaceship2={
     motorOn:false,
     facingLeft:false,
     facingRight:false,
+    img:img_spaceship2,
 };
 
 
@@ -108,11 +114,11 @@ function drawSpaceShip(ship){
     ctx.beginPath();
     ctx.translate(ship.position.x, ship.position.y);
     ctx.rotate(ship.angle);
-    //ctx.drawImage(img,ship.width*-0.5,ship.height*-0.5,ship.width,ship.height);
-    ctx.rect(ship.width*-0.5, ship.height*-0.5, ship.width, ship.height);
-    ctx.fillStyle = ship.color;
-    //ctx.stroke();
-    ctx.fill();
+    ctx.drawImage(ship.img,ship.width*-0.5,ship.height*-0.5,ship.width,ship.height);
+    //ctx.rect(ship.width*-0.5, ship.height*-0.5, ship.width, ship.height);
+    //ctx.fillStyle = ship.color;
+    ctx.stroke();
+    //ctx.fill();
     ctx.closePath();
     if(ship.motorOn) {
         drawMotor(ship);
