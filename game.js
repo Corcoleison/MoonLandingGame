@@ -13,6 +13,28 @@ var img_stars = new Image();
 img_stars.src = 'stars.jpg';
 var pattern_stars = ctx.createPattern(img_stars, 'repeat');
 
+var audio_explosion_sp1 = new Audio('sound/explosion.mp3');
+audio_explosion_sp1.loop=false;
+
+var audio_explosion_sp2 = new Audio('sound/explosion.mp3');
+audio_explosion_sp2.loop=false;
+
+function playAudioExplosion(ship){
+    if(!ship.played_explosion) ship.explosion_audio.play();
+    ship.played_explosion=true;
+}
+
+var audio_landing_sp1 = new Audio('sound/landing_success.mp3');
+audio_landing_sp1.loop=false;
+
+var audio_landing_sp2 = new Audio('sound/landing_success.mp3');
+audio_landing_sp2.loop=false;
+
+function playAudioLanding(ship){
+    if(!ship.played_landing) ship.landing_win_audio.play();
+    ship.played_landing=true;
+}
+
 var spaceship={
     color: "RED",
     width: 50,
@@ -35,6 +57,11 @@ var spaceship={
     goodEnd:false,
     groundTouched:false,
     particles:[],
+    played_explosion:false,
+    played_landing:false,
+    title_height:(canvas.height/2),
+    explosion_audio:audio_explosion_sp1,
+    landing_win_audio:audio_landing_sp1,
 };
 
 var spaceship2={
@@ -59,6 +86,11 @@ var spaceship2={
     goodEnd:false,
     groundTouched:false,
     particles:[],
+    played_explosion:false,
+    played_landing:false,
+    title_height:(canvas.height/2)-60,
+    explosion_audio:audio_explosion_sp2,
+    landing_win_audio:audio_landing_sp2,
 };
 
 
@@ -180,8 +212,8 @@ function isInEdges(ship){
             winner=ship;
             ship.end=true;
             ship.goodEnd=true;
+            ship.position.y=canvas.height-ship.height*0.5;
         }
-        ship.position.y=canvas.height-ship.height*0.5;
         ship.velocity.y = 0;
         ship.velocity.x=0;
         ship.angle=rotationShip;
@@ -215,24 +247,32 @@ function isInEdges(ship){
 
 function calculateEnd(ship){
     if(!ship.goodEnd && ship.groundTouched){
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        drawStars();
+        //ctx.clearRect(0,0,canvas.width,canvas.height);
+        //drawStars();
+        if(winner){
+            drawSpaceShip(winner);
+        }
         //drawlandingPlatform();
         ctx.font = "bold 50px serif";
         ctx.fillStyle = "red";
         ctx.textAlign = "center";
-        ctx.fillText("PATHETIC PLAVER "+ship.color, canvas.width/2, (canvas.height/2)-40);
+        ctx.fillText("PATHETIC PLAYER "+ship.color, canvas.width/2, ship.title_height);
         for (var i = 0; i < numparticles; i++) {
             ship.particles[i].update();
             ctx.beginPath();
             ctx.arc(ship.particles[i].position.getX(),ship.particles[i].position.getY(),3,0,2*Math.PI,false);
             ctx.fill();
         }
+        playAudioExplosion(ship);
+        ship.position.y=0;
+        ship.position.x=0;
     }else if(ship.goodEnd && ship.groundTouched){
+        //ctx.clearRect(0,0,canvas.width,canvas.height);
+        //drawStars();
         ctx.font = "bold 50px serif";
         ctx.fillStyle = "green";
         ctx.textAlign = "center";
-        ctx.fillText("CONGRATULATIONS PLAYER "+winner.color, canvas.width/2, canvas.height/2);
+        ctx.fillText("CONGRATULATIONS PLAYER "+ship.color, canvas.width/2, ship.title_height);
         for (var i = 0; i < numparticles; i++) {
             ship.particles[i].update();
             ctx.beginPath();
@@ -240,6 +280,7 @@ function calculateEnd(ship){
             ctx.fill();
         }
         drawSpaceShip(ship);
+        playAudioLanding(ship);
     }
 }
 
@@ -251,11 +292,10 @@ function draw(){
     var gp = gamepads[0];
     ctx.clearRect(0,0,canvas.width,canvas.height);
     drawStars();
-    //drawlandingPlatform();
     isInEdges(spaceship);
     isInEdges(spaceship2);
     collisionBetweenShips();
-    drawlandingPlatform();
+    //drawlandingPlatform();
     if(!spaceship.groundTouched){
         if(!spaceship.goodEnd){
             drawSpaceShip(spaceship);
@@ -270,6 +310,11 @@ function draw(){
     }
     if(!(spaceship2.end && spaceship.end)){
         axismoved(gp.axes);
+        
+    }else if(spaceship2.end && spaceship.end){
+        if(!(spaceship2.goodEnd && spaceship.goodEnd)){
+            
+        }
     }
     buttonPressed(gp.buttons);
     drawStats();
@@ -288,8 +333,8 @@ function drawStats(){
     if (!spaceship.velocity){
         return;
     }
-    velocityInfoGamepad.innerHTML="Velocity y: "+spaceship.velocity.y+ " Velocity x:" +spaceship.velocity.x;
-    velocityInfoKeyboard.innerHTML="Velocity y: "+spaceship2.velocity.y+ " Velocity x:" +spaceship2.velocity.x;
+    velocityInfoGamepad.innerHTML="Velocity y: "+spaceship.velocity.y.toFixed(2)+ " Velocity x:" +spaceship.velocity.x.toFixed(2);
+    velocityInfoKeyboard.innerHTML="Velocity y: "+spaceship2.velocity.y.toFixed(2)+ " Velocity x:" +spaceship2.velocity.x.toFixed(2);
 }
 
 function keyDown(event){
