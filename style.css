@@ -1,3 +1,30 @@
-canvas{
-  background-color: black;
+.canvas-container{
+  position: relative;
+  width: 800px;
+  height: 800px;
+}
+#canvas {
+  position: absolute;
+  background-color:black;
+}
+#titleStart {
+  position:absolute;
+  margin-top: 100px;
+  margin-left: 570px;
+  color: white;
+  text-align: center;
+}
+#divInfo{
+  position: relative;
+}
+#velocity-info-keyboard{
+  position: relative;
+  color: red;
+  margin-left: 1040px;
+  display: ruby;
+}
+#velocity-info-gamepad{
+  color: yellow;
+  position: relative;
+  margin-top: -20px;
 }

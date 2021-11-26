@@ -1,6 +1,8 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext('2d');
 
+var titleInfo = document.getElementById("titleStart");
+
 var img_spaceship = new Image();
 img_spaceship.src = 'spaceship_cartoon.png';
 var pattern = ctx.createPattern(img_spaceship, 'repeat');
@@ -9,7 +11,7 @@ var img_spaceship2 = new Image();
 img_spaceship2.src = 'spaceship2.png';
 var pattern = ctx.createPattern(img_spaceship2, 'repeat');
 
-var img_stars = new Image();
+var img_stars = new Image(0,0);
 img_stars.src = 'stars.jpg';
 var pattern_stars = ctx.createPattern(img_stars, 'repeat');
 
@@ -187,10 +189,12 @@ var landingPlatform={
 }
 
 function drawlandingPlatform(){
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(landingPlatform.position.x, landingPlatform.position.y,landingPlatform.width,landingPlatform.height);
     ctx.fillStyle = landingPlatform.color;
+    ctx.save();
+    ctx.translate(260.5, 447.5);
+    ctx.scale(1, 0.18518518518518517);
+    ctx.beginPath();
+    ctx.arc(0, 0, 137, 0, 6.283185307179586, false);
     ctx.fill();
     ctx.closePath();
     ctx.restore();
@@ -401,6 +405,11 @@ function draw(){
     }
     buttonPressed(gp.buttons);
     drawStats();
+    if(spaceship.end && spaceship2.end){
+        audio_theme.pause();
+        titleInfo.hidden=false;
+        titleInfo.innerHTML="PRESS START IN THE CONTROLLER";
+    }
     requestAnimationFrame(draw);
 }
 
@@ -465,9 +474,9 @@ var gamepadInfo = document.getElementById("gamepad-info");
 window.addEventListener("gamepadconnected", function(e) {
     var gp = navigator.getGamepads()[e.gamepad.index];
     gamepadInfo.innerHTML = "Gamepad connected at index " + gp.index + ": " + gp.id + ". It has " + gp.buttons.length + " buttons and " + gp.axes.length + " axes.";
-    
     draw();
     playAudioTheme();
+    titleInfo.hidden=true;
   });
 
 window.addEventListener("gamepaddisconnected", function(e) {
