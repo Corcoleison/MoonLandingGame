@@ -2,6 +2,8 @@ var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext('2d');
 
 var titleInfo = document.getElementById("titleStart");
+var thrustInfoKeyboard=document.getElementById("thrust-info-keyboard");
+var thrustInfoGamepad=document.getElementById("thrust-info-gamepad");
 
 var img_spaceship = new Image();
 img_spaceship.src = 'spaceship_cartoon.png';
@@ -136,6 +138,7 @@ var spaceship={
     title_height:(canvas.height/2),
     explosion_audio:audio_explosion_sp1,
     landing_win_audio:audio_landing_sp1,
+    thrustFuel:100,
 };
 
 var spaceship2={
@@ -165,6 +168,7 @@ var spaceship2={
     title_height:(canvas.height/2)-60,
     explosion_audio:audio_explosion_sp2,
     landing_win_audio:audio_landing_sp2,
+    thrustFuel:100,
 };
 
 
@@ -346,7 +350,7 @@ function calculateEnd(ship){
         }
         //drawlandingPlatform();
         ctx.font = "bold 50px serif";
-        ctx.fillStyle = "red";
+        ctx.fillStyle = ship.color;
         ctx.textAlign = "center";
         ctx.fillText("PATHETIC PLAYER "+ship.color, canvas.width/2, ship.title_height);
         for (var i = 0; i < numparticles; i++) {
@@ -386,6 +390,7 @@ function draw(){
     drawStars();
     isInEdges(spaceship);
     isInEdges(spaceship2);
+    checkFuel();
     collisionBetweenShips();
     //drawlandingPlatform();
     if(!spaceship.groundTouched){
@@ -413,6 +418,16 @@ function draw(){
     requestAnimationFrame(draw);
 }
 
+function checkFuel(){
+    if(spaceship.motorOn){
+        spaceship.thrustFuel--;
+    }
+    if(spaceship2.motorOn){
+        spaceship2.thrustFuel--;
+    }
+}
+
+
 function resetStats(spaceship){
     spaceship.velocity.x=0;
     spaceship.velocity.y=0;
@@ -427,6 +442,8 @@ function drawStats(){
     }
     velocityInfoGamepad.innerHTML="Velocity y: "+spaceship.velocity.y.toFixed(2)+ " Velocity x:" +spaceship.velocity.x.toFixed(2);
     velocityInfoKeyboard.innerHTML="Velocity y: "+spaceship2.velocity.y.toFixed(2)+ " Velocity x:" +spaceship2.velocity.x.toFixed(2);
+    thrustInfoGamepad.innerHTML="Thrust= "+spaceship.thrustFuel+" %";
+    thrustInfoKeyboard.innerHTML="Thrust= "+spaceship2.thrustFuel+" %";
 }
 
 function keyDown(event){

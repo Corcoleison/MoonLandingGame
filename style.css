@@ -19,12 +19,28 @@
 }
 #velocity-info-keyboard{
   position: relative;
-  color: red;
+  color: yellow;
   margin-left: 1040px;
   display: ruby;
 }
 #velocity-info-gamepad{
-  color: yellow;
+  color: red;
   position: relative;
   margin-top: -20px;
+}
+#thrust-info-gamepad{
+  color: red;
+  position: absolute;
+  margin-top: -20px;
+  display: ruby;
+}
+#thrust-info-keyboard{
+  color: yellow;
+  position: relative;
+  margin-left: 1170px;
+  display: ruby;
+}
+#title{
+  display: ruby-base;
+  margin-left: 100px;
 }
