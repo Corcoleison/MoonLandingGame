@@ -15,12 +15,12 @@
   text-align: center;
 }
 #divInfo{
-  position: relative;
+  position: absolute;
 }
 #velocity-info-keyboard{
   position: relative;
   color: yellow;
-  margin-left: 1040px;
+  margin-left: 81em;
   display: ruby;
 }
 #velocity-info-gamepad{
@@ -37,10 +37,15 @@
 #thrust-info-keyboard{
   color: yellow;
   position: relative;
-  margin-left: 1170px;
+  margin-left: 88em;
   display: ruby;
 }
 #title{
   display: ruby-base;
   margin-left: 100px;
+}
+html, body {
+  width:  100%;
+  height: 100%;
+  margin: 0;
 }

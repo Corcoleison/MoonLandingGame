@@ -1,6 +1,9 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext('2d');
 
+ctx.canvas.width  = window.innerWidth;
+ctx.canvas.height = window.innerHeight;
+
 var titleInfo = document.getElementById("titleStart");
 var thrustInfoKeyboard=document.getElementById("thrust-info-keyboard");
 var thrustInfoGamepad=document.getElementById("thrust-info-gamepad");
