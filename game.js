@@ -5,6 +5,7 @@ ctx.canvas.width  = window.innerWidth;
 ctx.canvas.height = window.innerHeight;
 
 var titleInfo = document.getElementById("titleStart");
+
 var thrustInfoKeyboard=document.getElementById("thrust-info-keyboard");
 var thrustInfoGamepad=document.getElementById("thrust-info-gamepad");
 
@@ -17,7 +18,7 @@ img_spaceship2.src = 'spaceship2.png';
 var pattern = ctx.createPattern(img_spaceship2, 'repeat');
 
 var img_stars = new Image(0,0);
-img_stars.src = 'stars.jpg';
+img_stars.src = 'stars_big.jpg';
 var pattern_stars = ctx.createPattern(img_stars, 'repeat');
 
 var audio_explosion_sp1 = new Audio('sound/explosion.mp3');
@@ -114,6 +115,10 @@ function playAudioTheme(){
     audio_theme.loop=false;
 }
 
+//titles randomly selected
+winner_titles = Array("CONGRATULATIONS ","SOOO GOOD ", "YOU'RE SIMPLY THE BEST ", "SO PROUD OF YOU ", "BRAVO ", "YOU DID IT ", "WELL F** DONE ", "IMPRESSIE ");
+loser_titles = Array("PATHETIC ", "YOU SUCK ", "HORRIBLE ", "TOTAL LOSER ", "TOTAL FAILURE ", "YOUR MOM WON'T BE PROUD ");
+
 var spaceship={
     color: "RED",
     width: 50,
@@ -142,6 +147,8 @@ var spaceship={
     explosion_audio:audio_explosion_sp1,
     landing_win_audio:audio_landing_sp1,
     thrustFuel:100,
+    looser_title: loser_titles[Math.floor(Math.random()*loser_titles.length)],
+    winner_title: winner_titles[Math.floor(Math.random()*winner_titles.length)],
 };
 
 var spaceship2={
@@ -172,6 +179,8 @@ var spaceship2={
     explosion_audio:audio_explosion_sp2,
     landing_win_audio:audio_landing_sp2,
     thrustFuel:100,
+    looser_title:loser_titles[Math.floor(Math.random()*loser_titles.length)],
+    winner_title:winner_titles[Math.floor(Math.random()*winner_titles.length)],
 };
 
 
@@ -296,6 +305,9 @@ var winner=null;
 //particles=[];
 numparticles=500;
 
+
+
+
 function isInEdges(ship){
     let velocityY=null;
     //landingPlatform
@@ -344,6 +356,7 @@ function isInEdges(ship){
 }
 
 
+
 function calculateEnd(ship){
     if(!ship.goodEnd && ship.groundTouched){
         //ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -355,7 +368,7 @@ function calculateEnd(ship){
         ctx.font = "bold 50px serif";
         ctx.fillStyle = ship.color;
         ctx.textAlign = "center";
-        ctx.fillText("PATHETIC PLAYER "+ship.color, canvas.width/2, ship.title_height);
+        ctx.fillText(ship.loser_title+"PLAYER "+ship.color, canvas.width/2, ship.title_height);
         for (var i = 0; i < numparticles; i++) {
             ship.particles[i].update();
             ctx.beginPath();
@@ -371,7 +384,7 @@ function calculateEnd(ship){
         ctx.font = "bold 50px serif";
         ctx.fillStyle = "green";
         ctx.textAlign = "center";
-        ctx.fillText("CONGRATULATIONS PLAYER "+ship.color, canvas.width/2, ship.title_height);
+        ctx.fillText(ship.winner_title+"PLAYER "+ship.color, canvas.width/2, ship.title_height);
         for (var i = 0; i < numparticles; i++) {
             ship.particles[i].update();
             ctx.beginPath();
@@ -546,6 +559,8 @@ function buttonPressed(b) {
     }
     return null;
   }
+
+
 
 
 

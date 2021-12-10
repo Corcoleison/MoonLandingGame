@@ -10,35 +10,41 @@
 #titleStart {
   position:absolute;
   margin-top: 100px;
-  margin-left: 570px;
+  margin-left: 800px;
   color: white;
   text-align: center;
 }
 #divInfo{
   position: absolute;
+  visibility: hidden;
 }
 #velocity-info-keyboard{
   position: relative;
   color: yellow;
   margin-left: 81em;
   display: ruby;
+  visibility: visible;
+
 }
 #velocity-info-gamepad{
   color: red;
   position: relative;
   margin-top: -20px;
+  visibility: visible;
 }
 #thrust-info-gamepad{
   color: red;
   position: absolute;
   margin-top: -20px;
   display: ruby;
+  visibility: hidden;
 }
 #thrust-info-keyboard{
   color: yellow;
   position: relative;
   margin-left: 88em;
   display: ruby;
+  visibility: hidden;
 }
 #title{
   display: ruby-base;
