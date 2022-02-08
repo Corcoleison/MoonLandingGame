@@ -1,6 +1,6 @@
 # MoonLandingGame
 
-Lunar lander reimagination for two players.
+Lunar lander reimagination for two players. Two controllers are need and the gamepad buttons may be mapped differently
 
 References:
 
